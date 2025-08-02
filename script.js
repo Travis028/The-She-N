@@ -336,30 +336,12 @@ document.addEventListener('DOMContentLoaded', () => {
         isMuted = !isMuted;
         audio.muted = isMuted;
         volumeIcon.textContent = isMuted ? '🔇' : '🔊';
-    });
-
-    // Add play/pause functionality
-    audio.addEventListener('play', () => {
-        isPlaying = true;
-        // Start heart animation when music starts
-        const hearts = document.querySelectorAll('.heart');
         hearts.forEach((heart, index) => {
-            // Start each heart with a slight delay
-            setTimeout(() => {
-                heart.style.animationPlayState = 'running';
-                // Adjust animation speed to match the romantic beat
-                heart.style.animationDuration = `${Math.random() * 2 + 2.5}s`;
-            }, index * 300);
-        });
-        
-        // Add smooth fade in
-        audio.volume = 0;
-        const fadeDuration = 3000; // 3 seconds for more romantic effect
-        const interval = 100;
-        
-        const fadeStep = 1 / (fadeDuration / interval);
-        let currentVolume = 0;
-        
+            // Set initial position
+            const initialX = Math.random() * window.innerWidth;
+            const initialY = Math.random() * window.innerHeight;
+            heart.style.left = `${initialX}px`;
+            heart.style.top = `${initialY}px`;
         const fadeInterval = setInterval(() => {
             currentVolume += fadeStep;
             audio.volume = currentVolume;
