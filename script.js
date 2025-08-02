@@ -20,59 +20,90 @@ const loveLetter = {
 // Function to animate the love letter
 function animateLoveLetter() {
     // Music controls
-    const music = document.getElementById('bgMusic');
+    const bgMusic = document.getElementById('bgMusic');
+    const mainAudio = document.getElementById('loveSong');
     const playBtn = document.getElementById('playBtn');
     const volumeSlider = document.getElementById('volume');
 
     // Initialize music state
-    let isPlaying = false;
+    let isBgPlaying = false;
+    let isMainPlaying = false;
 
-    // Try to play music automatically
-    function tryAutoPlay() {
-        music.muted = true;
-        music.play()
-            .then(() => {
-                music.muted = false;
-                isPlaying = true;
-                updatePlayButton();
-                // Set initial volume from localStorage
-                const savedVolume = localStorage.getItem('musicVolume');
-                if (savedVolume !== null) {
-                    volumeSlider.value = savedVolume;
-                    music.volume = parseFloat(savedVolume);
-                }
-            })
-            .catch(e => {
-                console.log("Auto-play prevented:", e);
-                // If autoplay fails, try to play when user interacts
-                document.addEventListener('click', () => {
-                    music.muted = false;
-                    music.play().then(() => {
-                        isPlaying = true;
-                        updatePlayButton();
-                    });
-                }, { once: true });
-            });
-    }
+    // Add error handling
+    bgMusic.addEventListener('error', (e) => {
+        console.error('Background music playback error:', e.target.error);
+        playBtn.innerHTML = '<i class="fas fa-exclamation-circle"></i> Error Loading Music';
+        playBtn.disabled = true;
+    });
+
+    mainAudio.addEventListener('error', (e) => {
+        console.error('Main audio playback error:', e.target.error);
+        playBtn.innerHTML = '<i class="fas fa-exclamation-circle"></i> Error Loading Music';
+        playBtn.disabled = true;
+    });
+
+    // Set initial volume
+    volumeSlider.value = '0.5';
+    bgMusic.volume = 0.5;
+    mainAudio.volume = 0.5;
 
     // Button control
     playBtn.addEventListener('click', () => {
-        if (music.paused) {
-            music.play().then(() => {
-                isPlaying = true;
-                updatePlayButton();
-            });
+        if (bgMusic.paused) {
+            bgMusic.play();
+            isBgPlaying = true;
+            updatePlayButton();
         } else {
-            music.pause();
-            isPlaying = false;
+            bgMusic.pause();
+            isBgPlaying = false;
             updatePlayButton();
         }
     });
 
     // Volume control
     volumeSlider.addEventListener('input', (e) => {
-        music.volume = e.target.value;
-        localStorage.setItem('musicVolume', e.target.value);
+        bgMusic.volume = e.target.value;
+        mainAudio.volume = e.target.value;
+    });
+
+    // Update play button text and icon
+    function updatePlayButton() {
+        if (isBgPlaying) {
+            playBtn.innerHTML = '<i class="fas fa-pause"></i> Pause Music';
+        } else {
+            playBtn.innerHTML = '<i class="fas fa-music"></i> Play Music';
+        }
+    }
+
+    // Initialize music state
+    let isPlaying = false;
+
+    // Try to play music immediately when page loads
+    window.addEventListener('load', () => {
+        // First try to play muted
+        bgMusic.muted = true;
+        bgMusic.play().then(() => {
+            // Then unmute and set volume
+            bgMusic.muted = false;
+            bgMusic.volume = 0.5;
+            isPlaying = true;
+            updatePlayButton();
+            
+            // Add event listener for user interaction
+            document.addEventListener('click', () => {
+                bgMusic.muted = false;
+                bgMusic.volume = 0.5;
+                bgMusic.play().catch(error => {
+                    console.error('Play error:', error);
+                    playBtn.innerHTML = '<i class="fas fa-exclamation-circle"></i> Error Playing Music';
+                    playBtn.disabled = true;
+                });
+            }, { once: true });
+        }).catch(error => {
+            console.error('Initial play error:', error);
+            // If autoplay fails, show play button
+            updatePlayButton();
+        });
     });
 
     // Update play button text and icon
@@ -84,25 +115,36 @@ function animateLoveLetter() {
         }
     }
 
-    // Try to auto-play when page loads
-    window.addEventListener('load', tryAutoPlay);
-
-    // Audio controls
-    const audio = document.getElementById('loveSong');
-    const playButton = document.getElementById('playButton');
-
-    // Play audio when play button is clicked
-    playButton.addEventListener('click', () => {
-        if (audio.paused) {
-            audio.play().catch(error => {
-                console.error('Error playing audio:', error);
-            });
-            playButton.innerHTML = '<i class="fas fa-heart-broken"></i> Pause Love Song';
+    // Button control
+    playBtn.addEventListener('click', () => {
+        if (bgMusic.paused) {
+            bgMusic.play();
+            isPlaying = true;
+            updatePlayButton();
         } else {
-            audio.pause();
-            playButton.innerHTML = '<i class="fas fa-heart"></i> Play Love Song';
+            bgMusic.pause();
+            isPlaying = false;
+            updatePlayButton();
         }
     });
+
+    // Audio controls
+    const musicControlButton = document.getElementById('playBtn');
+
+    // Play audio when play button is clicked
+    if (musicControlButton) {
+        musicControlButton.addEventListener('click', () => {
+            if (mainAudio.paused) {
+                mainAudio.play().catch(error => {
+                    console.error('Error playing audio:', error);
+                });
+                musicControlButton.innerHTML = '<i class="fas fa-heart-broken"></i> Pause Love Song';
+            } else {
+                mainAudio.pause();
+                musicControlButton.innerHTML = '<i class="fas fa-heart"></i> Play Love Song';
+            }
+        });
+    }
 
     // Auto-play audio when page loads
     window.addEventListener('load', () => {
