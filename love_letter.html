@@ -1,41 +1,42 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Love Letter in Code</title>
+    <title>Love Letter</title>
     <link rel="stylesheet" href="styles.css">
-    <title>Love you</title>
-    <link rel="stylesheet" href="styles.css">
-    <div class="audio-container">
-        <audio id="love-music" autoplay loop>
-        <source src="https://cdn.pixabay.com/download/audio/2022/06/22/audio_0996445c6d.mp3" type="audio/mpeg">
-        <source src="https://cdn.pixabay.com/download/audio/2022/06/22/audio_136354f997.mp3" type="audio/mpeg">
-        Your browser does not support the audio element.
-    </audio>
-        <div id="volumeControl" class="volume-icon">🔊</div>
-    </div>
 </head>
 <body>
-    <!-- Wayne's images -->
-    <div class="image-container wayne-image" style="background-image: url('wayne.jpeg')"></div>
-    <div class="image-container wayne-image" style="background-image: url('wayne1.jpeg')"></div>
-    
-    <!-- Nida's image -->
-    <div class="image-container nida-image" style="background-image: url('nida.jpeg')"></div>
-    
-    <!-- Main babe image -->
-    <div class="image-container main-image" style="background-image: url('babe.jpeg')"></div>
-    <div class="romantic-overlay"></div>
-    <div class="heart-container">
-        <div class="heart heart-1" style="left: 20%"></div>
-        <div class="heart heart-2" style="left: 40%"></div>
-        <div class="heart heart-3" style="left: 60%"></div>
-        <div class="heart heart-4" style="left: 80%"></div>
+    <!-- Background Images -->
+    <div class="slideshow">
+        <div class="slide" style="background-image: url('Wayne.jpeg')"></div>
+        <div class="slide" style="background-image: url('babe.jpeg')"></div>
+        <div class="slide" style="background-image: url('nida.jpeg')"></div>
     </div>
-    <div class="code-block love-letter">
-        <p>
-            <span class="name"><br>My Beloved Nidah<br></span>,
+    
+    <!-- Love Letter Text -->
+    <!-- Floating Images Container -->
+    <div class="floating-images">
+        <div class="floating-image" style="background-image: url('Wayne.jpeg')"></div>
+        <div class="floating-image" style="background-image: url('babe.jpeg')"></div>
+        <div class="floating-image" style="background-image: url('nida.jpeg')"></div>
+    </div>
+    <!-- Music controls -->
+    <div class="music-control">
+        <audio id="bgMusic" loop>
+            <source src="audio/alone-296348.mp3" type="audio/mpeg">
+            Your browser does not support audio
+        </audio>
+        <button id="playBtn">
+            <i class="fas fa-music"></i> Play Music
+        </button>
+        <div class="volume-control">
+            <span>Volume:</span>
+            <input type="range" id="volume" min="0" max="1" step="0.1" value="0.5">
+        </div>
+    </div>
+
+    <div class="love-letter">
+        <p>My Dearest babe
+            <br><span class="name">My Beloved Nidah<br></span>,
 
 Every time I sit down to write about you, I find myself lost in thoughts of everything you mean to me. How do I put into words a feeling so deep, so powerful, that it takes over my whole heart and soul? <span class="name">Nidah</span>, loving you is the most beautiful thing that has ever happened in my life, and I want you to know just how much you mean to me.
 
@@ -52,7 +53,7 @@ Nidah, I want you to know this: I am yours. Every heartbeat, every breath, every
 Thank you for being you—so beautiful, so loving, so amazing. You are the best thing that has ever happened to me, and I will never stop loving you. My heart, my soul, my everything—it’s all yours, Nidah.
 
 Forever and always,
-<span class="signature">Wayne</span>
+<span class="signature">Wayne</span><br>
 
 </p>
     </div>

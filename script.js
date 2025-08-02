@@ -19,8 +19,129 @@ const loveLetter = {
 
 // Function to animate the love letter
 function animateLoveLetter() {
-    // Music control
+    // Music controls
+    const music = document.getElementById('bgMusic');
+    const playBtn = document.getElementById('playBtn');
+    const volumeSlider = document.getElementById('volume');
+
+    // Initialize music state
+    let isPlaying = false;
+
+    // Try to play music automatically
+    function tryAutoPlay() {
+        music.muted = true;
+        music.play()
+            .then(() => {
+                music.muted = false;
+                isPlaying = true;
+                updatePlayButton();
+                // Set initial volume from localStorage
+                const savedVolume = localStorage.getItem('musicVolume');
+                if (savedVolume !== null) {
+                    volumeSlider.value = savedVolume;
+                    music.volume = parseFloat(savedVolume);
+                }
+            })
+            .catch(e => {
+                console.log("Auto-play prevented:", e);
+                // If autoplay fails, try to play when user interacts
+                document.addEventListener('click', () => {
+                    music.muted = false;
+                    music.play().then(() => {
+                        isPlaying = true;
+                        updatePlayButton();
+                    });
+                }, { once: true });
+            });
+    }
+
+    // Button control
+    playBtn.addEventListener('click', () => {
+        if (music.paused) {
+            music.play().then(() => {
+                isPlaying = true;
+                updatePlayButton();
+            });
+        } else {
+            music.pause();
+            isPlaying = false;
+            updatePlayButton();
+        }
+    });
+
+    // Volume control
+    volumeSlider.addEventListener('input', (e) => {
+        music.volume = e.target.value;
+        localStorage.setItem('musicVolume', e.target.value);
+    });
+
+    // Update play button text and icon
+    function updatePlayButton() {
+        if (isPlaying) {
+            playBtn.innerHTML = '<i class="fas fa-pause"></i> Pause Music';
+        } else {
+            playBtn.innerHTML = '<i class="fas fa-music"></i> Play Music';
+        }
+    }
+
+    // Try to auto-play when page loads
+    window.addEventListener('load', tryAutoPlay);
+
+    // Audio controls
     const audio = document.getElementById('loveSong');
+    const playButton = document.getElementById('playButton');
+
+    // Play audio when play button is clicked
+    playButton.addEventListener('click', () => {
+        if (audio.paused) {
+            audio.play().catch(error => {
+                console.error('Error playing audio:', error);
+            });
+            playButton.innerHTML = '<i class="fas fa-heart-broken"></i> Pause Love Song';
+        } else {
+            audio.pause();
+            playButton.innerHTML = '<i class="fas fa-heart"></i> Play Love Song';
+        }
+    });
+
+    // Auto-play audio when page loads
+    window.addEventListener('load', () => {
+        // Check if audio can play
+        if (audio) {
+            audio.play().catch(error => {
+                console.error('Error playing audio:', error);
+            });
+        }
+    });
+
+    // Add hover effect to audio container
+    const audioContainer = document.querySelector('.audio-container');
+    if (audioContainer) {
+        audioContainer.addEventListener('mouseenter', () => {
+            audioContainer.style.transform = 'translateY(-2px)';
+            audioContainer.style.boxShadow = '0 0 30px rgba(0, 0, 0, 0.4), 0 0 15px rgba(255, 0, 128, 0.3)';
+        });
+
+        audioContainer.addEventListener('mouseleave', () => {
+            audioContainer.style.transform = 'translateY(0)';
+            audioContainer.style.boxShadow = '0 0 20px rgba(0, 0, 0, 0.3), 0 0 10px rgba(255, 0, 128, 0.2)';
+        });
+    }
+
+    // Add volume control
+    audio.addEventListener('volumechange', () => {
+        localStorage.setItem('audioVolume', audio.volume);
+    });
+
+    // Restore volume on page load
+    window.addEventListener('load', () => {
+        const savedVolume = localStorage.getItem('audioVolume');
+        if (savedVolume !== null) {
+            audio.volume = parseFloat(savedVolume);
+        }
+    });
+
+    // Music control
     const volumeIcon = document.getElementById('volumeControl');
     let isMuted = false;
 
@@ -281,40 +402,24 @@ document.addEventListener('DOMContentLoaded', () => {
         const currentTime = audio.currentTime;
         const duration = audio.duration;
         const progress = currentTime / duration;
-        
-        // Update heart animations based on music progress
-        const hearts = document.querySelectorAll('.heart');
-        hearts.forEach((heart, index) => {
-            const baseDelay = (index * 2) / 100;
-            const romanticDelay = Math.sin(progress * Math.PI * 1.5) * 0.3; // Slower, more romantic wave
-            heart.style.animationDelay = `${progress * 6 - baseDelay + romanticDelay}s`;
-            
-            // Add romantic color changes
-            const colorProgress = Math.sin(progress * Math.PI * 2) * 0.5 + 0.5;
-            heart.style.color = `rgb(${255 * colorProgress}, ${0}, ${150 * colorProgress})`;
-        });
 
-        // Update background images every second
-        const images = document.querySelectorAll('.image-container');
-        const totalImages = images.length;
-        const currentImage = Math.floor((currentTime / 1) % totalImages); // Switch every second
-        
-        images.forEach((image, index) => {
-            const isCurrent = index === currentImage;
-            const progress = (currentTime % 1) / 1; // Progress within current second
-            
-            // Calculate opacity based on transition
-            let opacity = 0;
-            if (isCurrent) {
-                opacity = 1 - progress; // Fade out
-            } else if (index === (currentImage + 1) % totalImages) {
-                opacity = progress; // Fade in
-            }
-            
-            image.style.opacity = opacity;
-            
+        const romanticProgress = Math.sin(currentTime / audio.duration * Math.PI * 2);
+
+        // Apply romantic effects to all images
+        images.forEach((image) => {
+            // Add romantic overlay
+            image.style.filter = `brightness(${1.5 + romanticProgress * 0.3}) contrast(${1.5 + romanticProgress * 0.3}) saturate(${1.5 + romanticProgress * 0.3})`;
+
+            // Add glow effect
+            const glowIntensity = Math.abs(romanticProgress) * 20;
+            image.style.boxShadow = `0 0 ${glowIntensity}px rgba(255, 0, 128, ${romanticProgress * 0.5})`;
+
+            // Add outline for better visibility
+            image.style.outline = `5px solid rgba(255, 255, 255, ${romanticProgress * 0.3})`;
+            image.style.outlineOffset = '-5px';
+
             // Add slight scale animation
-            const scale = 1.02 + (Math.sin(progress * Math.PI * 2) * 0.02);
+            const scale = 1.02 + (Math.sin(romanticProgress * Math.PI * 2) * 0.02);
             image.style.transform = `scale(${scale})`;
         });
 
@@ -351,12 +456,13 @@ document.addEventListener('DOMContentLoaded', () => {
     
     playWithRetries();
 });
-    // Add typing effect to the title
-    const title = document.querySelector('title');
-    if (title) {
-        title.textContent = '';
-        let i = 0;
-        const typing = setInterval(() => {
+
+// Add typing effect to the title
+const title = document.querySelector('title');
+if (title) {
+    title.textContent = '';
+    let i = 0;
+    const typing = setInterval(() => {
             if (i < 'Love Letter in Code'.length) {
                 title.textContent += 'Love Letter in Code'.charAt(i);
                 i++;
@@ -413,6 +519,20 @@ function createHeartAnimation() {
 
 // Initialize the page
 document.addEventListener('DOMContentLoaded', () => {
+    const slides = document.querySelectorAll('.slide');
+    let currentSlide = 0;
+    
+    // Show first slide immediately
+    slides[currentSlide].classList.add('active');
+    
+    // Change slide every 5 seconds
+    setInterval(() => {
+        slides[currentSlide].classList.remove('active');
+        currentSlide = (currentSlide + 1) % slides.length;
+        slides[currentSlide].classList.add('active');
+        console.log(`Now showing slide ${currentSlide}`);
+    }, 5000);
+    
     // Add heart animations when clicking
     document.body.addEventListener('click', createHeartAnimation);
     
