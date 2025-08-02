@@ -370,6 +370,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }, interval);
     });
 
+    // Add pause functionality
+    audio.addEventListener('pause', () => {
+        isPlaying = false;
+        // Pause heart animations when music is paused
+        const hearts = document.querySelectorAll('.heart');
+        hearts.forEach(heart => {
+            heart.style.animationPlayState = 'paused';
+        });
+    });
+
     audio.addEventListener('pause', () => {
         isPlaying = false;
         // Pause heart animations when music is paused
